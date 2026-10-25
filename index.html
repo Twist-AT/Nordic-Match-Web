@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Nordic-Match</title>
+  
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #0c1724;
+      overflow: hidden;
+      touch-action: none;
+      overscroll-behavior: none;
+    }
+    #unity-container {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0c1724;
+    }
+    #unity-canvas {
+      width: min(100vw, calc(100vh * 1080 / 1920));
+      height: min(100vh, calc(100vw * 1920 / 1080));
+      background: #0c1724;
+      touch-action: none;
+      outline: none;
+    }
+    #unity-loading {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(280px, 70vw);
+      transform: translate(-50%, -50%);
+      color: #ffecbc;
+      font: 16px/1.4 sans-serif;
+      text-align: center;
+    }
+    #unity-progress {
+      margin-top: 12px;
+      height: 8px;
+      background: #1b2c3d;
+    }
+    #unity-progress > div {
+      width: 0;
+      height: 100%;
+      background: #d7a441;
+    }
+    #unity-warning {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 8px 12px;
+      color: #ffecbc;
+      background: rgba(0, 0, 0, 0.72);
+      font: 14px/1.4 sans-serif;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas" width="1080" height="1920" tabindex="-1"></canvas>
+    <div id="unity-loading">
+      <div>Nordic Match</div>
+      <div id="unity-progress"><div id="unity-progress-bar"></div></div>
+    </div>
+    <div id="unity-warning"></div>
+  </div>
+  <script>
+    var canvas = document.querySelector("#unity-canvas");
+    var loading = document.querySelector("#unity-loading");
+    var progressBar = document.querySelector("#unity-progress-bar");
+    var warning = document.querySelector("#unity-warning");
+
+    function unityShowBanner(msg, type) {
+      if (!msg) return;
+      warning.style.display = "block";
+      warning.textContent = msg;
+    }
+
+    function webAudioContext() {
+      if (typeof WEBAudio !== "undefined" && WEBAudio.audioContext)
+        return WEBAudio.audioContext;
+      return null;
+    }
+
+    function unlockWebAudio() {
+      try {
+        var ctx = webAudioContext();
+        if (ctx && ctx.state === "suspended" && ctx.resume) {
+          var pending = ctx.resume();
+          if (pending && pending.catch)
+            pending.catch(function () {});
+        }
+      } catch (error) {}
+    }
+
+    window.addEventListener("pointerdown", unlockWebAudio, true);
+    window.addEventListener("touchstart", unlockWebAudio, true);
+    window.addEventListener("keydown", unlockWebAudio, true);
+    canvas.addEventListener("pointerdown", function () { canvas.focus(); });
+
+    var buildUrl = "Build";
+    var config = {
+      dataUrl: buildUrl + "/Nordic-Match-Web.data.unityweb",
+      frameworkUrl: buildUrl + "/Nordic-Match-Web.framework.js.unityweb",
+      codeUrl: buildUrl + "/Nordic-Match-Web.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "Twist Production",
+      productName: "Nordic-Match",
+      productVersion: "1.0",
+      showBanner: unityShowBanner,
+      matchWebGLToCanvasSize: false,
+      devicePixelRatio: 1
+    };
+
+    var loader = document.createElement("script");
+    loader.src = buildUrl + "/Nordic-Match-Web.loader.js";
+    loader.onload = function () {
+      createUnityInstance(canvas, config, function (progress) {
+        progressBar.style.width = (100 * progress) + "%";
+      }).then(function () {
+        loading.style.display = "none";
+        unlockWebAudio();
+      }).catch(function (message) {
+        loading.style.display = "none";
+        unityShowBanner(String(message), "error");
+      });
+    };
+    loader.onerror = function () {
+      unityShowBanner("Der WebGL-Loader fehlt. Liegt der Build unter Build/?", "error");
+    };
+    document.body.appendChild(loader);
+  </script>
+</body>
+</html>

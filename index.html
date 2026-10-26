@@ -108,9 +108,9 @@
 
     var buildUrl = "Build";
     var config = {
-      dataUrl: buildUrl + "/Nordic-Match-Web.data.unityweb",
-      frameworkUrl: buildUrl + "/Nordic-Match-Web.framework.js.unityweb",
-      codeUrl: buildUrl + "/Nordic-Match-Web.wasm.unityweb",
+      dataUrl: buildUrl + "/62c060870c1d878daa533811751371a7.data.unityweb",
+      frameworkUrl: buildUrl + "/52f698297b35435a2f1a9633fd2c31c8.framework.js.unityweb",
+      codeUrl: buildUrl + "/8adc6c69fc796b9a8d66aaa4df2d8916.wasm.unityweb",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "DefaultCompany",
       productName: "Nordic-Match",
@@ -121,7 +121,7 @@
     };
 
     var loader = document.createElement("script");
-    loader.src = buildUrl + "/Nordic-Match-Web.loader.js";
+    loader.src = buildUrl + "/9d60dbe11c5e64a011c39755744a7de4.loader.js";
     loader.onload = function () {
       createUnityInstance(canvas, config, function (progress) {
         progressBar.style.width = (100 * progress) + "%";
